@@ -5,12 +5,9 @@
 
 package com.google.appinventor.client.editor.simple.components;
 
-import static com.google.appinventor.client.Ode.MESSAGES;
-
-import com.google.appinventor.client.editor.simple.SimpleComponentDatabase;
-
 import com.google.appinventor.client.Images;
 import com.google.appinventor.client.Ode;
+import com.google.appinventor.client.editor.simple.SimpleComponentDatabase;
 import com.google.appinventor.client.editor.simple.SimpleEditor;
 import com.google.appinventor.client.editor.youngandroid.YaBlocksEditor;
 import com.google.appinventor.client.explorer.SourceStructureExplorerItem;
@@ -21,11 +18,7 @@ import com.google.appinventor.client.widgets.LabeledTextBox;
 import com.google.appinventor.client.widgets.dnd.DragSource;
 import com.google.appinventor.client.widgets.dnd.DragSourceSupport;
 import com.google.appinventor.client.widgets.dnd.DropTarget;
-import com.google.appinventor.client.widgets.properties.EditableProperties;
-import com.google.appinventor.client.widgets.properties.EditableProperty;
-import com.google.appinventor.client.widgets.properties.PropertyChangeListener;
-import com.google.appinventor.client.widgets.properties.PropertyEditor;
-import com.google.appinventor.client.widgets.properties.TextPropertyEditor;
+import com.google.appinventor.client.widgets.properties.*;
 import com.google.appinventor.client.youngandroid.TextValidators;
 import com.google.appinventor.shared.rpc.project.HasAssetsFolder;
 import com.google.appinventor.shared.rpc.project.ProjectNode;
@@ -33,36 +26,15 @@ import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidAssets
 import com.google.appinventor.shared.rpc.project.youngandroid.YoungAndroidProjectNode;
 import com.google.appinventor.shared.settings.SettingsConstants;
 import com.google.appinventor.shared.storage.StorageUtil;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.Event;
+import com.google.gwt.event.dom.client.*;
+import com.google.gwt.user.client.*;
 import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.DialogBox;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.MouseListener;
-import com.google.gwt.user.client.ui.MouseListenerCollection;
-import com.google.gwt.user.client.ui.SourcesMouseEvents;
-import com.google.gwt.user.client.ui.TreeItem;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.ui.impl.ClippedImagePrototype;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.google.appinventor.client.Ode.MESSAGES;
 
 /**
  * Abstract superclass for all components in the visual designer.
@@ -84,6 +56,18 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     "SimpleForm", "String", "Pattern", "YailList", "YailNumberToString", "YailRuntimeError");
 
   public static final int BORDER_SIZE = 2 + 2; // see ode-SimpleMockComponent in Ya.css
+
+  public boolean isInAbsolutePosition() {
+    return isInAbsolutePosition;
+  }
+
+  public int getLeft() {
+    return left;
+  }
+
+  public int getTop() {
+    return top;
+  }
 
   /**
    * This class defines the dialog box for renaming a component.
@@ -230,6 +214,9 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   // Component container the component belongs to (this will be null for the root component aka the
   // form)
   private MockContainer container;
+  private boolean isInAbsolutePosition;
+  private int top;
+  private int left;
 
   private MouseListenerCollection mouseListeners = new MouseListenerCollection();
 
@@ -627,6 +614,20 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
    */
   protected final void setContainer(MockContainer container) {
     this.container = container;
+    this.isInAbsolutePosition = false;
+  }
+
+
+  /**
+   * Sets the component container to which the component belongs.
+   *
+   * @param container owning component container for this component
+   */
+  protected final void setAbsoluteContainer(MockContainer container, int top, int left) {
+    this.container = container;
+    this.isInAbsolutePosition = true;
+    this.top = top;
+    this.left = left;
   }
 
   /**

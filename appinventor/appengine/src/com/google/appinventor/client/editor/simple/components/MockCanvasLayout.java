@@ -107,6 +107,12 @@ final class MockCanvasLayout extends MockLayout {
     // Position the children.
     for (MockComponent child : containerLayoutInfo.visibleChildren) {
       LayoutInfo childLayoutInfo = containerLayoutInfo.layoutInfoMap.get(child);
+
+      if (child.isInAbsolutePosition()) {
+        container.setChildSizeAndPosition(child, childLayoutInfo, child.getTop(), child.getLeft());
+        continue;
+      }
+
       int x;
       try {
         x = (int) Math.round(Double.parseDouble(child.getPropertyValue(PROPERTY_NAME_X)));

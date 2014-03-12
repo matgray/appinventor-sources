@@ -12,12 +12,16 @@ import com.google.appinventor.client.widgets.dnd.DropTarget;
 import com.google.common.base.Preconditions;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.AbsolutePanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Abstract superclass for all container mock components.
@@ -26,10 +30,42 @@ import java.util.Map;
  */
 public abstract class MockContainer extends MockVisibleComponent implements DropTarget {
 
+  Logger logger = Logger.getLogger("MockContainerLogger");
+
+  private void loginfo(String s) {
+    logger.log(Level.INFO, "MockRelativeLayout#" + s);
+  }
+
+  private class Coordinate {
+    int x;
+    int y;
+
+    Coordinate(int x, int y) {
+      this.x = x;
+      this.y = y;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (o instanceof Coordinate) {
+        Coordinate c = (Coordinate) o;
+        return x == c.x && y == c.y;
+      }
+      return false;
+    }
+
+    @Override
+    public int hashCode() {
+      return ("(" + x + "," + "y" + ")").hashCode();
+    }
+  }
+
   protected final MockLayout layout;
 
   // List of components within the container
   protected final List<MockComponent> children;
+  // Map of
+  protected final Map<MockComponent, Coordinate> absoluteChildren;
 
   /**
    * Directly contains the widgets corresponding to children MockComponents.
@@ -41,7 +77,33 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
    * This is a GWT absolute panel so that the {@link MockLayout} associated
    * with this container can freely position and size children widgets as desired.
    */
-  protected final AbsolutePanel rootPanel;
+  protected final foo rootPanel;
+
+  class foo extends AbsolutePanel {
+    @Override
+    public void add(Widget w) {
+      loginfo("add Called");
+      super.add(w);
+    }
+
+    @Override
+    public void add(Widget w, int left, int top) {
+      loginfo("add Called (" + left + ", " + top + ")");
+      super.add(w, left, top);
+    }
+
+    @Override
+    public void add(IsWidget w, int left, int top) {
+      loginfo("add is Called (" + left + ", " + top + ")");
+      super.add(w, left, top);
+    }
+
+    @Override
+    public void setWidgetPosition(Widget w, int left, int top) {
+      loginfo("setwidgetPosition called (" + left + ", " + top + ")");
+      super.setWidgetPosition(w, left, top);
+    }
+  }
 
   /**
    * Creates a new component container.
@@ -61,7 +123,8 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
     layout.setContainer(this);
 
     children = new ArrayList<MockComponent>();
-    rootPanel = new AbsolutePanel();
+    absoluteChildren = new HashMap<MockComponent, Coordinate>();
+    rootPanel = new foo();
   }
 
   @Override
@@ -127,6 +190,7 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
    */
   public final void addVisibleComponent(MockComponent component, int beforeVisibleIndex) {
     List<MockComponent> visibleChildren = getShowingVisibleChildren();
+    loginfo("addVisibleCompoenent Called");
 
     int beforeActualIndex;
     if ((beforeVisibleIndex == -1) || (beforeVisibleIndex == visibleChildren.size())) {
@@ -175,6 +239,30 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
 
     getForm().fireComponentAdded(component);
   }
+
+  public void addVisibleComponentAtAbsolutePosition(MockComponent component, int top, int left) {
+    component.setAbsoluteContainer(this, top, left);
+
+    absoluteChildren.put(component, new Coordinate(top, left));
+    children.add(component);
+
+    if (component.isVisibleComponent()) {
+      // NOTE: The order of widgets in the root panel does not necessarily
+      //       match the order of their associated children of this container
+      rootPanel.add(component, top, left);
+      // UGH THESE DONT DO ANYTHING
+//      component.getElement().setAttribute("left", left + "px");
+//      component.getElement().setAttribute("top", top + "px");
+      loginfo("Before refreshform");
+      refreshForm();
+      loginfo("After refreshform");
+//      rootPanel.setWidgetPosition(component,top,left);
+    }
+    loginfo("Before fire");
+    getForm().fireComponentAdded(component);
+    loginfo("After fire");
+  }
+
 
   /**
    * Removes a component from the container (assumes that component is a child
@@ -228,6 +316,7 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
     child.setPixelSize(childLayoutInfo.width, childLayoutInfo.height);
     // Note that the actual size of the child will be larger than childLayoutInfo.width X
     // childLayoutInfo.height because the actual size will include the CSS border.
+    loginfo("set child s & p: (" + x + "," + y + ")");
     rootPanel.setWidgetPosition(child, x, y);
   }
 
