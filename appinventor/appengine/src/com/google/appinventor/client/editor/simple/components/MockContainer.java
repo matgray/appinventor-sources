@@ -17,7 +17,6 @@ import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -33,39 +32,13 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
   Logger logger = Logger.getLogger("MockContainerLogger");
 
   private void loginfo(String s) {
-    logger.log(Level.INFO, "MockRelativeLayout#" + s);
-  }
-
-  private class Coordinate {
-    int x;
-    int y;
-
-    Coordinate(int x, int y) {
-      this.x = x;
-      this.y = y;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (o instanceof Coordinate) {
-        Coordinate c = (Coordinate) o;
-        return x == c.x && y == c.y;
-      }
-      return false;
-    }
-
-    @Override
-    public int hashCode() {
-      return ("(" + x + "," + "y" + ")").hashCode();
-    }
+    logger.log(Level.INFO, "MockContainer#" + s);
   }
 
   protected final MockLayout layout;
 
   // List of components within the container
   protected final List<MockComponent> children;
-  // Map of
-  protected final Map<MockComponent, Coordinate> absoluteChildren;
 
   /**
    * Directly contains the widgets corresponding to children MockComponents.
@@ -123,7 +96,6 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
     layout.setContainer(this);
 
     children = new ArrayList<MockComponent>();
-    absoluteChildren = new HashMap<MockComponent, Coordinate>();
     rootPanel = new foo();
   }
 
@@ -243,7 +215,6 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
   public void addVisibleComponentAtAbsolutePosition(MockComponent component, int top, int left) {
     component.setAbsoluteContainer(this, top, left);
 
-    absoluteChildren.put(component, new Coordinate(top, left));
     children.add(component);
 
     if (component.isVisibleComponent()) {

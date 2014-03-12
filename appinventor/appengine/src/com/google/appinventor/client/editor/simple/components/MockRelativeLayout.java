@@ -448,6 +448,7 @@ public class MockRelativeLayout extends MockLayout {
       // top of the child is above that by childHeightWithBorder/2
       int topY = centerY - (childHeightWithBorder / 2);
 
+      loginfo("Setting ChildSizeAndPosition to: " + child.getTop() + "," + child.getLeft());
       container.setChildSizeAndPosition(child, childLayoutInfo, child.getTop(), child.getLeft());
       layoutHeight = Math.max(layoutHeight, topY + childHeightWithBorder);
       childMidpoints[index] = leftX + (childWidthWithBorder / 2);
@@ -460,7 +461,6 @@ public class MockRelativeLayout extends MockLayout {
   @Override
   void onDragContinue(int x, int y) {
     if (childMidpoints != null) {
-      loginfo("On Drag Continue: (" + x + ", " + y + ")");
       // Display the divider at the insert location
       setDividerLocation(x, y);
     }
@@ -474,7 +474,6 @@ public class MockRelativeLayout extends MockLayout {
 
   @Override
   boolean onDrop(MockComponent source, int x, int y, int offsetX, int offsetY) {
-    loginfo("onDrop: (" + x + ", " + y + ") (" + offsetX + ", " + offsetY + ")");
     if (x != -1 && x != -1) {
 
       // Hide the divider.

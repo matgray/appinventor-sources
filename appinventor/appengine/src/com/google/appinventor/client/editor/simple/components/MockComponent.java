@@ -51,6 +51,8 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   protected static final String PROPERTY_NAME_NAME = "Name";
   protected static final String PROPERTY_NAME_UUID = "Uuid";
   protected static final String PROPERTY_NAME_SOURCE = "Source";
+  protected static final String PROPERTY_NAME_LEFT = "ComponentLeft";
+  protected static final String PROPERTY_NAME_TOP = "ComponentTop";
   protected static final List<String> YAIL_NAMES = Arrays.asList("CsvUtil", "Double", "Float",
     "Integer", "JavaCollection", "JavaIterator", "KawaEnvironment", "Long", "Short",
     "SimpleForm", "String", "Pattern", "YailList", "YailNumberToString", "YailRuntimeError");
@@ -62,11 +64,11 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   }
 
   public int getLeft() {
-    return left;
+    return (int) Float.parseFloat(getPropertyValue(PROPERTY_NAME_LEFT));
   }
 
   public int getTop() {
-    return top;
+    return (int) Float.parseFloat(getPropertyValue(PROPERTY_NAME_TOP));
   }
 
   /**
@@ -215,8 +217,6 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   // form)
   private MockContainer container;
   private boolean isInAbsolutePosition;
-  private int top;
-  private int left;
 
   private MouseListenerCollection mouseListeners = new MouseListenerCollection();
 
@@ -331,6 +331,9 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
     changeProperty(PROPERTY_NAME_UUID, "" + Random.nextInt());
 
     editor.getComponentPalettePanel().configureComponent(this);
+
+    addProperty(PROPERTY_NAME_LEFT, "0", null, new FloatPropertyEditor());
+    addProperty(PROPERTY_NAME_TOP, "0", null, new FloatPropertyEditor());
   }
 
   public boolean isPropertyPersisted(String propertyName) {
@@ -626,8 +629,8 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
   protected final void setAbsoluteContainer(MockContainer container, int top, int left) {
     this.container = container;
     this.isInAbsolutePosition = true;
-    this.top = top;
-    this.left = left;
+    changeProperty(PROPERTY_NAME_TOP, Float.toString(top));
+    changeProperty(PROPERTY_NAME_LEFT, Float.toString(left));
   }
 
   /**
