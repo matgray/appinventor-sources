@@ -345,7 +345,9 @@ public abstract class MockComponent extends Composite implements PropertyChangeL
 
   protected boolean isPropertyVisible(String propertyName) {
     if (propertyName.equals(PROPERTY_NAME_NAME) ||
-        propertyName.equals(PROPERTY_NAME_UUID)) {
+        propertyName.equals(PROPERTY_NAME_UUID) ||
+        propertyName.equals(PROPERTY_NAME_TOP) ||
+        propertyName.equals(PROPERTY_NAME_LEFT)) {
       return false;
     }
     return true;

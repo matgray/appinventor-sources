@@ -5,16 +5,15 @@
 
 package com.google.appinventor.client.editor.simple.components;
 
-import static com.google.appinventor.client.Ode.MESSAGES;
-
-import java.util.Map;
-
 import com.google.appinventor.client.ErrorReporter;
 import com.google.appinventor.client.output.OdeLog;
 import com.google.appinventor.components.common.ComponentConstants;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
+import java.util.Map;
+
+import static com.google.appinventor.client.Ode.MESSAGES;
 
 
 /**
@@ -609,7 +608,7 @@ abstract class MockHVLayoutBase extends MockLayout {
   }
 
   @Override
-  void onDragContinue(int x, int y) {
+  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
     if (childMidpoints != null) {
       // Calculate the position where the hovering component should be inserted
       int insertPos = -1;

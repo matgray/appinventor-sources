@@ -2,49 +2,29 @@ package com.google.appinventor.client.editor.simple.components;
 
 import com.google.appinventor.client.output.OdeLog;
 import com.google.appinventor.components.common.ComponentConstants;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MockRelativeLayout extends MockLayout {
-  Logger logger = Logger.getLogger("RelativeLogger");
-
-  private void loginfo(String s) {
-    logger.log(Level.INFO, "MockRelativeLayout#" + s);
-  }
 
   // Gap between adjacent components to allow for the insertion divider
   private static final int COMPONENT_SPACING = 5;
 
   // The color of the insertion divider
-  private static final String DIVIDER_COLOR = "#ff0000";
+  private static final String DIVIDER_COLOR = "#0000ff";
 
   private static final int EMPTY_WIDTH = ComponentConstants.EMPTY_HV_ARRANGEMENT_WIDTH;
   private static final int EMPTY_HEIGHT = ComponentConstants.EMPTY_HV_ARRANGEMENT_HEIGHT;
 
   protected final int orientation;
 
-  /**
-   * The location of the insertion divider that shows where a dragged component
-   * that is hovering over this layout's container will be inserted if the
-   * component is dropped.
-   * <p/>
-   * Legal values include {@code -1} (divider invisible) and {@code 0} (before
-   * the first child) to {@code numChildren} (after the last child).
-   */
-//  private int dividerPos;
-
   // The DIV element that displays the insertion divider.
   // Is added to the root panel of the associated container.
-  private Element dividerElement; // lazily initialized
-
-  // Offset of each child's center along the axis of this layout;
-  // calculated in layoutContainer; used to calculate the correct
-  // drop location for a component dropped onto this layout's container
-  private int[] childMidpoints;
+  private Element verticalDividerElement; // lazily initialized
+  private Element horizontalDividerElement; // lazily initialized
 
   // constants to indicate horizontal and vertical alignment
   private enum HorizontalAlignment {
@@ -75,37 +55,70 @@ public class MockRelativeLayout extends MockLayout {
     alignV = VerticalAlignment.Top;
   }
 
-  // Divider
-
   private void ensureDividerInited() {
-    if (dividerElement == null) {
-      dividerElement = DOM.createDiv();
-      DOM.setStyleAttribute(dividerElement, "backgroundColor", DIVIDER_COLOR);
-      setDividerVisible(false);
-      DOM.appendChild(container.getRootPanel().getElement(), dividerElement);
+
+    if (verticalDividerElement == null) {
+      verticalDividerElement = DOM.createDiv();
+      DOM.setStyleAttribute(verticalDividerElement, "backgroundColor", DIVIDER_COLOR);
+      setDividerVisible(verticalDividerElement, false);
+      DOM.appendChild(container.getRootPanel().getElement(), verticalDividerElement);
+    }
+
+    if (horizontalDividerElement == null) {
+      horizontalDividerElement = DOM.createDiv();
+      DOM.setStyleAttribute(horizontalDividerElement, "backgroundColor", DIVIDER_COLOR);
+      setDividerVisible(horizontalDividerElement, false);
+      DOM.appendChild(container.getRootPanel().getElement(), horizontalDividerElement);
     }
   }
 
   private void setDividerLocation(int x, int y) {
     if (x == -1 || y == -1) {
-      setDividerVisible(false);
+      setDividerVisible(verticalDividerElement, false);
+      setDividerVisible(horizontalDividerElement, false);
+      return;
+    }
+
+    int containerHeight = container.getRootPanel().getOffsetHeight();
+    int containerWidth = container.getRootPanel().getOffsetWidth();
+    // Show Vertical placement
+    if (y < containerHeight / 2) {
+      setDividerBoundsAndShow(
+          verticalDividerElement,
+          x, 0,
+          COMPONENT_SPACING, y);
     } else {
-      setDividerBoundsAndShow(x, 0,
-          COMPONENT_SPACING, container.getOffsetHeight());
+      setDividerBoundsAndShow(
+          verticalDividerElement,
+          x, y,
+          COMPONENT_SPACING, containerHeight);
+    }
+
+    // Show Horizontal Placement
+    if (x < containerWidth / 2) {
+      setDividerBoundsAndShow(
+          horizontalDividerElement,
+          0, y,
+          x, COMPONENT_SPACING);
+    } else {
+      setDividerBoundsAndShow(
+          horizontalDividerElement,
+          x, y,
+          containerWidth, COMPONENT_SPACING);
     }
   }
 
-  private void setDividerVisible(boolean visible) {
-    DOM.setStyleAttribute(dividerElement, "visibility", visible ? "visible" : "hidden");
+  private void setDividerVisible(Element element, boolean visible) {
+    DOM.setStyleAttribute(element, "visibility", visible ? "visible" : "hidden");
   }
 
-  private void setDividerBoundsAndShow(int x, int y, int width, int height) {
-    DOM.setStyleAttribute(dividerElement, "position", "absolute");
-    DOM.setStyleAttribute(dividerElement, "left", x + "px");
-    DOM.setStyleAttribute(dividerElement, "top", y + "px");
-    DOM.setStyleAttribute(dividerElement, "width", width + "px");
-    DOM.setStyleAttribute(dividerElement, "height", height + "px");
-    setDividerVisible(true);
+  private void setDividerBoundsAndShow(Element element, int x, int y, int width, int height) {
+    DOM.setStyleAttribute(element, "position", "absolute");
+    DOM.setStyleAttribute(element, "left", x + "px");
+    DOM.setStyleAttribute(element, "top", y + "px");
+    DOM.setStyleAttribute(element, "width", width + "px");
+    DOM.setStyleAttribute(element, "height", height + "px");
+    setDividerVisible(element, true);
   }
 
   // MockLayout methods
@@ -220,7 +233,6 @@ public class MockRelativeLayout extends MockLayout {
   @Override
   void layoutChildren(LayoutInfo containerLayoutInfo) {
     int visibleChildrenSize = containerLayoutInfo.visibleChildren.size();
-    childMidpoints = new int[visibleChildrenSize];
     if (visibleChildrenSize > 0) {
       layoutHorizontal(containerLayoutInfo);
     } else {
@@ -431,7 +443,6 @@ public class MockRelativeLayout extends MockLayout {
     }
 
     // Position each child and update layoutWidth and layoutHeight.
-    int index = 0;
     firstChild = true;
     for (MockComponent child : containerLayoutInfo.visibleChildren) {
       // add spacing, but not before first child
@@ -448,28 +459,40 @@ public class MockRelativeLayout extends MockLayout {
       // top of the child is above that by childHeightWithBorder/2
       int topY = centerY - (childHeightWithBorder / 2);
 
-      loginfo("Setting ChildSizeAndPosition to: " + child.getTop() + "," + child.getLeft());
       container.setChildSizeAndPosition(child, childLayoutInfo, child.getTop(), child.getLeft());
       layoutHeight = Math.max(layoutHeight, topY + childHeightWithBorder);
-      childMidpoints[index] = leftX + (childWidthWithBorder / 2);
       leftX += childWidthWithBorder;
-      index++;
     }
     layoutWidth = leftX;
   }
 
   @Override
-  void onDragContinue(int x, int y) {
-    if (childMidpoints != null) {
-      // Display the divider at the insert location
-      setDividerLocation(x, y);
+  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
+    Style style = source.getElement().getStyle();
+    x = x - offsetX + (parseSourceStyle(style.getWidth()) / 2);
+    y = y - offsetY + (parseSourceStyle(style.getHeight()) / 2);
+
+    int containerWidth = container.getRootPanel().getOffsetWidth();
+    int containerHeight = container.getRootPanel().getOffsetHeight();
+
+    if (Math.abs(y - (containerHeight / 2)) < 20) {
+      y = containerHeight / 2;
     }
+    if (Math.abs(x - (containerWidth / 2)) < 20) {
+      x = containerWidth / 2;
+    }
+    setDividerLocation(x, y);
   }
 
   @Override
   void onDragLeave() {
     // Hide the divider and clean up
     setDividerLocation(-1, -1);
+  }
+
+  int parseSourceStyle(String sourceStyle) {
+    // -2 because of trailint 'px'
+    return (int) Float.parseFloat(sourceStyle.substring(0, sourceStyle.length() - 2));
   }
 
   @Override
@@ -489,7 +512,13 @@ public class MockRelativeLayout extends MockLayout {
         // It's just being moved from one container to another.
         srcContainer.removeComponent(source, false);
       }
-      dstContainer.addVisibleComponentAtAbsolutePosition(source, x - offsetX, y - offsetY);
+      int dropTop = parseSourceStyle(DOM.getStyleAttribute(verticalDividerElement, "left"));
+      int dropLeft = parseSourceStyle(DOM.getStyleAttribute(horizontalDividerElement, "top"));
+
+      int offsetWidth = parseSourceStyle(source.getElement().getStyle().getWidth()) / 2;
+      int offsetHeight = parseSourceStyle(source.getElement().getStyle().getHeight()) / 2;
+
+      dstContainer.addVisibleComponentAtAbsolutePosition(source, dropTop - offsetWidth, dropLeft - offsetHeight);
       return true;
     }
     return false;
@@ -497,8 +526,11 @@ public class MockRelativeLayout extends MockLayout {
 
   @Override
   void dispose() {
-    if (dividerElement != null) {
-      DOM.removeChild(container.getRootPanel().getElement(), dividerElement);
+    if (verticalDividerElement != null) {
+      DOM.removeChild(container.getRootPanel().getElement(), verticalDividerElement);
+    }
+    if (horizontalDividerElement != null) {
+      DOM.removeChild(container.getRootPanel().getElement(), horizontalDividerElement);
     }
   }
 }

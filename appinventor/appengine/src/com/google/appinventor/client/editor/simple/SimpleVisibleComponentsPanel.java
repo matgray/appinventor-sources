@@ -5,7 +5,6 @@
 
 package com.google.appinventor.client.editor.simple;
 
-import static com.google.appinventor.client.Ode.MESSAGES;
 import com.google.appinventor.client.editor.ProjectEditor;
 import com.google.appinventor.client.editor.simple.components.MockForm;
 import com.google.appinventor.client.editor.simple.palette.SimplePaletteItem;
@@ -19,9 +18,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
+import static com.google.appinventor.client.Ode.MESSAGES;
+
 /**
  * Panel in the Simple design editor holding visible Simple components.
- *
  */
 public final class SimpleVisibleComponentsPanel extends Composite implements DropTarget {
   // UI elements
@@ -39,11 +39,11 @@ public final class SimpleVisibleComponentsPanel extends Composite implements Dro
   /**
    * Creates new component design panel for visible components.
    *
-   * @param nonVisibleComponentsPanel  corresponding panel for non-visible
-   *                                   components
+   * @param nonVisibleComponentsPanel corresponding panel for non-visible
+   *                                  components
    */
   public SimpleVisibleComponentsPanel(final SimpleEditor editor,
-      SimpleNonVisibleComponentsPanel nonVisibleComponentsPanel) {
+                                      SimpleNonVisibleComponentsPanel nonVisibleComponentsPanel) {
     this.nonVisibleComponentsPanel = nonVisibleComponentsPanel;
     projectEditor = editor.getProjectEditor();
 
@@ -57,8 +57,8 @@ public final class SimpleVisibleComponentsPanel extends Composite implements Dro
         // onLoad is called immediately after a widget becomes attached to the browser's document.
         boolean showHiddenComponents = Boolean.parseBoolean(
             projectEditor.getProjectSettingsProperty(
-            SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
-            SettingsConstants.YOUNG_ANDROID_SETTINGS_SHOW_HIDDEN_COMPONENTS));
+                SettingsConstants.PROJECT_YOUNG_ANDROID_SETTINGS,
+                SettingsConstants.YOUNG_ANDROID_SETTINGS_SHOW_HIDDEN_COMPONENTS));
         checkboxShowHiddenComponents.setValue(showHiddenComponents);
       }
     };
@@ -83,7 +83,7 @@ public final class SimpleVisibleComponentsPanel extends Composite implements Dro
   /**
    * Associates a Simple form component with this panel.
    *
-   * @param form  backing mocked form component
+   * @param form backing mocked form component
    */
   public void setForm(MockForm form) {
     this.form = form;
@@ -104,13 +104,13 @@ public final class SimpleVisibleComponentsPanel extends Composite implements Dro
   public boolean onDragEnter(DragSource source, int x, int y) {
     // Accept palette items for non-visible components only
     return (source instanceof SimplePaletteItem) &&
-      !((SimplePaletteItem) source).isVisibleComponent() &&
-      nonVisibleComponentsPanel.onDragEnter(source, -1, -1);
+        !((SimplePaletteItem) source).isVisibleComponent() &&
+        nonVisibleComponentsPanel.onDragEnter(source, -1, -1);
   }
 
   @Override
-  public void onDragContinue(DragSource source, int x, int y) {
-    nonVisibleComponentsPanel.onDragContinue(source, -1, -1);
+  public void onDragContinue(DragSource source, int x, int y, int offsetX, int offsetY) {
+    nonVisibleComponentsPanel.onDragContinue(source, -1, -1, offsetX, offsetY);
   }
 
   @Override

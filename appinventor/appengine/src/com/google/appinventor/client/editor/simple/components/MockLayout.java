@@ -63,7 +63,7 @@ abstract class MockLayout {
    * @see com.google.appinventor.client.widgets.dnd.DropTarget#
    *      onDragContinue(com.google.appinventor.client.widgets.dnd.DragSource, int, int)
    */
-  void onDragContinue(int x, int y) {
+  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
   }
 
   /**

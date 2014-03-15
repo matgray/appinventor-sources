@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * A layout that arranges its children in a grid (with variable sized rows and
  * columns).
- * <p>
+ * <p/>
  * If multiple children claim to be in the same cell, the last child in the
  * children list wins.
  *
@@ -29,7 +29,9 @@ final class MockTableLayout extends MockLayout {
       this.row = row;
       this.col = col;
     }
-  };
+  }
+
+  ;
 
   private class TableLayoutInfo extends LayoutInfo {
     MockComponent[][] cellChildren;
@@ -363,7 +365,7 @@ final class MockTableLayout extends MockLayout {
   }
 
   @Override
-  void onDragContinue(int x, int y) {
+  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
     // Find the cell the user is hovering over.
     setDropTargetCell(getCellContainingPoint(x, y));
   }

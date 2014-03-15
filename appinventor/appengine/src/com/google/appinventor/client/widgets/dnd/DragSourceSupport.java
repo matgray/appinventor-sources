@@ -450,9 +450,12 @@ public final class DragSourceSupport implements MouseListener {
     // Inform the hover-target of the continuing drag
     if (hoverDropTarget != null) {
       Widget targetWidget = hoverDropTarget.getDropTargetWidget();
+      Widget dragWidget = getDragWidget();
       hoverDropTarget.onDragContinue(dragSource,
           /*localX*/ absX - targetWidget.getAbsoluteLeft(),
-          /*localY*/ absY - targetWidget.getAbsoluteTop());
+          /*localY*/ absY - targetWidget.getAbsoluteTop(),
+          getDragWidgetOffsetX(dragWidget),
+          getDragWidgetOffsetY(dragWidget));
     }
   }
 
