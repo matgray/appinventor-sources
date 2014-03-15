@@ -126,6 +126,9 @@ public interface Images extends Resources {
   @Source("com/google/appinventor/images/horizontal.png")
   ImageResource horizontal();
 
+  @Source("com/google/appinventor/images/relative.png")
+  ImageResource relative();
+
   /**
    * Designer palette item: image component
    * Also used for image file icon for project explorer

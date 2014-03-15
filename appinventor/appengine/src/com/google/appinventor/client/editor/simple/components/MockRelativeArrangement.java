@@ -18,7 +18,7 @@ public class MockRelativeArrangement extends MockContainer {
     // super(editor, type, icon, myLayout);
     // but Java won't let me do that.
 
-    super(editor, TYPE, images.horizontal(), MockRelativeArrangementHelper.makeLayout());
+    super(editor, TYPE, images.relative(), MockRelativeArrangementHelper.makeLayout());
     // Note(hal): There better not be any calls to MockHVArrangementHelper before the
     // next instruction.  Note that the Helper methods are synchronized to avoid possible
     // future problems if we ever have threads creating arrangements in parallel.

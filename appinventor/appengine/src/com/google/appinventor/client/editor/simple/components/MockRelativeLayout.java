@@ -469,8 +469,11 @@ public class MockRelativeLayout extends MockLayout {
   @Override
   void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
     Style style = source.getElement().getStyle();
-    x = x - offsetX + (parseSourceStyle(style.getWidth()) / 2);
-    y = y - offsetY + (parseSourceStyle(style.getHeight()) / 2);
+
+    if (style.getWidth().length() != 0) {
+      x = x - offsetX + (parseSourceStyle(style.getWidth()) / 2);
+      y = y - offsetY + (parseSourceStyle(style.getHeight()) / 2);
+    }
 
     int containerWidth = container.getRootPanel().getOffsetWidth();
     int containerHeight = container.getRootPanel().getOffsetHeight();
@@ -491,8 +494,12 @@ public class MockRelativeLayout extends MockLayout {
   }
 
   int parseSourceStyle(String sourceStyle) {
-    // -2 because of trailint 'px'
-    return (int) Float.parseFloat(sourceStyle.substring(0, sourceStyle.length() - 2));
+    try {
+      // -2 because of trailint 'px'
+      return (int) Float.parseFloat(sourceStyle.substring(0, sourceStyle.length() - 2));
+    } catch (NumberFormatException e) {
+      return 0;
+    }
   }
 
   @Override
