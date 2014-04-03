@@ -109,8 +109,8 @@ public final class SimpleVisibleComponentsPanel extends Composite implements Dro
   }
 
   @Override
-  public void onDragContinue(DragSource source, int x, int y, int offsetX, int offsetY) {
-    nonVisibleComponentsPanel.onDragContinue(source, -1, -1, offsetX, offsetY);
+  public void onDragContinue(DragSource source, int x, int y, int sourceLeft, int sourceTop) {
+    nonVisibleComponentsPanel.onDragContinue(source, -1, -1, sourceLeft, sourceTop);
   }
 
   @Override

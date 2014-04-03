@@ -58,7 +58,7 @@ public interface DropTarget {
    * @param y  the y-coordinate of the cursor,
    *           relative to the top-left corner of this drop target's widget
    */
-  public void onDragContinue(DragSource source, int x, int y, int offsetX, int offsetY);
+  public void onDragContinue(DragSource source, int x, int y, int sourceLeft, int sourceTop);
 
   /**
    * Invoked while an accepted drag source has been dragged outside the bounds

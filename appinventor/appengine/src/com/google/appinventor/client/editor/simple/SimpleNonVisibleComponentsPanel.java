@@ -99,7 +99,7 @@ public final class SimpleNonVisibleComponentsPanel extends Composite implements 
   }
 
   @Override
-  public void onDragContinue(DragSource source, int x, int y, int offsetX, int offsetY) {
+  public void onDragContinue(DragSource source, int x, int y, int sourceLeft, int sourceTop) {
     // no action
   }
 

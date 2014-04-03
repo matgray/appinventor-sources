@@ -289,9 +289,9 @@ public abstract class MockContainer extends MockVisibleComponent implements Drop
   }
 
   @Override
-  public final void onDragContinue(DragSource source, int x, int y, int offsetX, int offsetY) {
+  public final void onDragContinue(DragSource source, int x, int y, int sourceLeft, int sourceTop) {
     MockComponent sourceComponent = dragSourceToMockComponenet(source);
-    layout.onDragContinue(sourceComponent, x, y, offsetX, offsetY);
+    layout.onDragContinue(sourceComponent, x, y, sourceLeft, sourceTop);
   }
 
   @Override

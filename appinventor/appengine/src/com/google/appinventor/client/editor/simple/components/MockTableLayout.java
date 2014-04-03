@@ -365,7 +365,7 @@ final class MockTableLayout extends MockLayout {
   }
 
   @Override
-  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
+  void onDragContinue(MockComponent source, int x, int y, int sourceLeft, int sourceTop) {
     // Find the cell the user is hovering over.
     setDropTargetCell(getCellContainingPoint(x, y));
   }

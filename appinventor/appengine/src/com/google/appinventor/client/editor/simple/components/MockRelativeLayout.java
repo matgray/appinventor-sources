@@ -31,12 +31,10 @@ public class MockRelativeLayout extends MockLayout {
     Left, Center, Right
   }
 
-  ;
   private HorizontalAlignment alignH;
 
   private enum VerticalAlignment {Top, Center, Bottom}
 
-  ;
   private VerticalAlignment alignV;
 
 
@@ -47,7 +45,6 @@ public class MockRelativeLayout extends MockLayout {
     orientation = ComponentConstants.LAYOUT_ORIENTATION_HORIZONTAL;
     layoutWidth = EMPTY_WIDTH;
     layoutHeight = EMPTY_HEIGHT;
-//    dividerPos = -1;
 
     // These initial values are assuming that the default values in ComponentConstants are
     // defined as LEFT and TOP
@@ -72,7 +69,7 @@ public class MockRelativeLayout extends MockLayout {
     }
   }
 
-  private void setDividerLocation(int x, int y) {
+  private void setDividerLocation(int x, int y, boolean xFull, boolean yFull) {
     if (x == -1 || y == -1) {
       setDividerVisible(verticalDividerElement, false);
       setDividerVisible(horizontalDividerElement, false);
@@ -82,29 +79,43 @@ public class MockRelativeLayout extends MockLayout {
     int containerHeight = container.getRootPanel().getOffsetHeight();
     int containerWidth = container.getRootPanel().getOffsetWidth();
     // Show Vertical placement
-    if (y < containerHeight / 2) {
+    if (yFull) {
       setDividerBoundsAndShow(
           verticalDividerElement,
           x, 0,
-          COMPONENT_SPACING, y);
-    } else {
-      setDividerBoundsAndShow(
-          verticalDividerElement,
-          x, y,
           COMPONENT_SPACING, containerHeight);
+    } else {
+      if (y < containerHeight / 2) {
+        setDividerBoundsAndShow(
+            verticalDividerElement,
+            x, 0,
+            COMPONENT_SPACING, y);
+      } else {
+        setDividerBoundsAndShow(
+            verticalDividerElement,
+            x, y,
+            COMPONENT_SPACING, containerHeight);
+      }
     }
 
-    // Show Horizontal Placement
-    if (x < containerWidth / 2) {
+    if (xFull) {
       setDividerBoundsAndShow(
           horizontalDividerElement,
           0, y,
-          x, COMPONENT_SPACING);
-    } else {
-      setDividerBoundsAndShow(
-          horizontalDividerElement,
-          x, y,
           containerWidth, COMPONENT_SPACING);
+    } else {
+      // Show Horizontal Placement
+      if (x < containerWidth / 2) {
+        setDividerBoundsAndShow(
+            horizontalDividerElement,
+            0, y,
+            x, COMPONENT_SPACING);
+      } else {
+        setDividerBoundsAndShow(
+            horizontalDividerElement,
+            x, y,
+            containerWidth, COMPONENT_SPACING);
+      }
     }
   }
 
@@ -467,36 +478,42 @@ public class MockRelativeLayout extends MockLayout {
   }
 
   @Override
-  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
+  void onDragContinue(MockComponent source, int x, int y, int sourceLeft, int sourceTop) {
     Style style = source.getElement().getStyle();
 
-    if (style.getWidth().length() != 0) {
-      x = x - offsetX + (parseSourceStyle(style.getWidth()) / 2);
-      y = y - offsetY + (parseSourceStyle(style.getHeight()) / 2);
+    // This will be true only if the component has already been added to the screen
+    if (style.getWidth().length() != 0 && style.getHeight().length() != 0) {
+      x = (int) (sourceLeft + (parseSourceStyle(style.getWidth()) / 2));
+      y = (int) (sourceTop + (parseSourceStyle(style.getHeight()) / 2));
     }
 
     int containerWidth = container.getRootPanel().getOffsetWidth();
     int containerHeight = container.getRootPanel().getOffsetHeight();
+    boolean yFill = false;
+    boolean xFill = false;
 
     if (Math.abs(y - (containerHeight / 2)) < 20) {
       y = containerHeight / 2;
+      xFill = true;
     }
     if (Math.abs(x - (containerWidth / 2)) < 20) {
       x = containerWidth / 2;
+      yFill = true;
     }
-    setDividerLocation(x, y);
+
+    setDividerLocation(x, y, xFill, yFill);
   }
 
   @Override
   void onDragLeave() {
     // Hide the divider and clean up
-    setDividerLocation(-1, -1);
+    setDividerLocation(-1, -1, false, false);
   }
 
-  int parseSourceStyle(String sourceStyle) {
+  float parseSourceStyle(String sourceStyle) {
     try {
       // -2 because of trailint 'px'
-      return (int) Float.parseFloat(sourceStyle.substring(0, sourceStyle.length() - 2));
+      return Float.parseFloat(sourceStyle.substring(0, sourceStyle.length() - 2));
     } catch (NumberFormatException e) {
       return 0;
     }
@@ -504,10 +521,10 @@ public class MockRelativeLayout extends MockLayout {
 
   @Override
   boolean onDrop(MockComponent source, int x, int y, int offsetX, int offsetY) {
-    if (x != -1 && x != -1) {
+    if (x != -1 && y != -1) {
 
       // Hide the divider.
-      setDividerLocation(-1, -1);
+      setDividerLocation(-1, -1, false, false);
 
       // Calculate drop information
       MockContainer srcContainer = source.getContainer();
@@ -519,13 +536,20 @@ public class MockRelativeLayout extends MockLayout {
         // It's just being moved from one container to another.
         srcContainer.removeComponent(source, false);
       }
-      int dropTop = parseSourceStyle(DOM.getStyleAttribute(verticalDividerElement, "left"));
-      int dropLeft = parseSourceStyle(DOM.getStyleAttribute(horizontalDividerElement, "top"));
 
-      int offsetWidth = parseSourceStyle(source.getElement().getStyle().getWidth()) / 2;
-      int offsetHeight = parseSourceStyle(source.getElement().getStyle().getHeight()) / 2;
+      Style style = source.getElement().getStyle();
 
-      dstContainer.addVisibleComponentAtAbsolutePosition(source, dropTop - offsetWidth, dropLeft - offsetHeight);
+      if (style.getWidth().length() != 0) {
+        float dropTop = parseSourceStyle(DOM.getStyleAttribute(verticalDividerElement, "left"));
+        float dropLeft = parseSourceStyle(DOM.getStyleAttribute(horizontalDividerElement, "top"));
+
+        float offsetWidth = parseSourceStyle(style.getWidth()) / 2;
+        float offsetHeight = parseSourceStyle(style.getHeight()) / 2;
+
+        dstContainer.addVisibleComponentAtAbsolutePosition(source, (int) (dropTop - offsetWidth), (int) (dropLeft - offsetHeight));
+      } else {
+        dstContainer.addVisibleComponentAtAbsolutePosition(source, x - offsetX, y - offsetY);
+      }
       return true;
     }
     return false;

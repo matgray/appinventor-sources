@@ -39,7 +39,6 @@ abstract class MockHVLayoutBase extends MockLayout {
   protected final int orientation;
 
 
-
   // Possible locations for the insertion divider;
   // calculated in layoutContainer.
   private int[] dividerLocations;
@@ -48,7 +47,7 @@ abstract class MockHVLayoutBase extends MockLayout {
    * The location of the insertion divider that shows where a dragged component
    * that is hovering over this layout's container will be inserted if the
    * component is dropped.
-   * <p>
+   * <p/>
    * Legal values include {@code -1} (divider invisible) and {@code 0} (before
    * the first child) to {@code numChildren} (after the last child).
    */
@@ -64,10 +63,16 @@ abstract class MockHVLayoutBase extends MockLayout {
   private int[] childMidpoints;
 
   // constants to indicate horizontal and vertical alignment
-  private enum HorizontalAlignment {Left, Center, Right};
+  private enum HorizontalAlignment {
+    Left, Center, Right
+  }
+
+  ;
   private HorizontalAlignment alignH;
 
-  private enum VerticalAlignment {Top, Center, Bottom};
+  private enum VerticalAlignment {Top, Center, Bottom}
+
+  ;
   private VerticalAlignment alignV;
 
 
@@ -329,7 +334,7 @@ abstract class MockHVLayoutBase extends MockLayout {
 
     // The final remaining height, which will be zero if any of the components have height
     // fill-parent
-   int finalRemainingHeight = remainingHeight;
+    int finalRemainingHeight = remainingHeight;
 
     // Resolve any child's width or height that is fill-parent, and call layoutChildren for
     // children that are containers.
@@ -357,17 +362,17 @@ abstract class MockHVLayoutBase extends MockLayout {
     int topY = 0;
 
     switch (alignV) {
-    case Top:
-      topY = 0;
-      break;
-    case Center:
-      topY = finalRemainingHeight / 2;
-      break;
-    case Bottom:
-      topY = finalRemainingHeight;
-      break;
-    default:
-      OdeLog.elog("System error: Bad value for vertical alignment -- MockHVLayoutBase");
+      case Top:
+        topY = 0;
+        break;
+      case Center:
+        topY = finalRemainingHeight / 2;
+        break;
+      case Bottom:
+        topY = finalRemainingHeight;
+        break;
+      default:
+        OdeLog.elog("System error: Bad value for vertical alignment -- MockHVLayoutBase");
     }
 
     int index = 0;
@@ -393,17 +398,17 @@ abstract class MockHVLayoutBase extends MockLayout {
       // layout (right-align).
       int leftX = 0;
       switch (alignH) {
-      case Left:
-        leftX = 0;
-        break;
-      case Center:
-        leftX = (containerLayoutInfo.width - childWidthWithBorder) / 2 ;
-        break;
-      case Right:
-        leftX = containerLayoutInfo.width - childWidthWithBorder;
-        break;
-      default:
-        OdeLog.elog("System error: Bad value for horizontal alignment -- MockHVLayoutBase");
+        case Left:
+          leftX = 0;
+          break;
+        case Center:
+          leftX = (containerLayoutInfo.width - childWidthWithBorder) / 2;
+          break;
+        case Right:
+          leftX = containerLayoutInfo.width - childWidthWithBorder;
+          break;
+        default:
+          OdeLog.elog("System error: Bad value for horizontal alignment -- MockHVLayoutBase");
       }
 
       container.setChildSizeAndPosition(child, childLayoutInfo, leftX, topY);
@@ -458,8 +463,8 @@ abstract class MockHVLayoutBase extends MockLayout {
       // If the width is fill parent, use automatic width.
       int childWidth = (childLayoutInfo.width == MockVisibleComponent.LENGTH_FILL_PARENT)
           ? childLayoutInfo.calculateAutomaticWidth()
-              : childLayoutInfo.width;
-          width += childWidth + BORDER_SIZE;
+          : childLayoutInfo.width;
+      width += childWidth + BORDER_SIZE;
     }
     return width;
   }
@@ -537,20 +542,20 @@ abstract class MockHVLayoutBase extends MockLayout {
     // centered at the top of the arrangement, or each child at the middle of the
     // arrangement.
 
-   //we have to initialize this, or else Eclipse will whine at us
+    //we have to initialize this, or else Eclipse will whine at us
     int centerY = 0;
 
     switch (alignV) {
-    case Top:
-      centerY = maxHeight / 2;
-      break;
-    case Center:
-      centerY = containerLayoutInfo.height / 2;
-      break;
-    case Bottom:
-      centerY = containerLayoutInfo.height - (maxHeight / 2);
-    default:
-      OdeLog.elog("System error: Bad value for vertical alignment -- MockHVLayoutBase");
+      case Top:
+        centerY = maxHeight / 2;
+        break;
+      case Center:
+        centerY = containerLayoutInfo.height / 2;
+        break;
+      case Bottom:
+        centerY = containerLayoutInfo.height - (maxHeight / 2);
+      default:
+        OdeLog.elog("System error: Bad value for vertical alignment -- MockHVLayoutBase");
     }
 
 
@@ -565,17 +570,17 @@ abstract class MockHVLayoutBase extends MockLayout {
     // child is at the right edge of the layout (right-align).
     int leftX = 0;
     switch (alignH) {
-    case Left:
-      leftX = 0;
-      break;
-    case Center:
-      leftX = finalRemainingWidth / 2;
-      break;
-    case Right:
-      leftX = finalRemainingWidth;
-      break;
-    default:
-      OdeLog.elog("System error: Bad value for horizontal justification -- MockHVLayoutBase");
+      case Left:
+        leftX = 0;
+        break;
+      case Center:
+        leftX = finalRemainingWidth / 2;
+        break;
+      case Right:
+        leftX = finalRemainingWidth;
+        break;
+      default:
+        OdeLog.elog("System error: Bad value for horizontal justification -- MockHVLayoutBase");
     }
 
     // Position each child and update layoutWidth and layoutHeight.
@@ -608,7 +613,7 @@ abstract class MockHVLayoutBase extends MockLayout {
   }
 
   @Override
-  void onDragContinue(MockComponent source, int x, int y, int offsetX, int offsetY) {
+  void onDragContinue(MockComponent source, int x, int y, int sourceLeft, int sourceTop) {
     if (childMidpoints != null) {
       // Calculate the position where the hovering component should be inserted
       int insertPos = -1;
@@ -676,6 +681,7 @@ abstract class MockHVLayoutBase extends MockLayout {
   /**
    * Set the layout flags centerH and centerV that govern whether the layout performs
    * horizontal or vertical centering.   Called by the arrangement that uses this layout
+   *
    * @param centering is the string value of the centering property "0", "1", "2", or "3"
    */
 
@@ -683,19 +689,19 @@ abstract class MockHVLayoutBase extends MockLayout {
   public void setHAlignmentFlags(String alignment) {
     try {
       switch (Integer.parseInt(alignment)) {
-      case ComponentConstants.GRAVITY_LEFT:
-        alignH = HorizontalAlignment.Left;
-        break;
-      case ComponentConstants.GRAVITY_CENTER_HORIZONTAL:
-        alignH = HorizontalAlignment.Center;
-        break;
-      case ComponentConstants.GRAVITY_RIGHT:
-        alignH = HorizontalAlignment.Right;
-        break;
-      default:
-        // This error should not happen because the higher level
-        // setter for HorizontalAlignment should screen out illegal inputs.
-        ErrorReporter.reportError(MESSAGES.badValueForHorizontalAlignment(alignment));
+        case ComponentConstants.GRAVITY_LEFT:
+          alignH = HorizontalAlignment.Left;
+          break;
+        case ComponentConstants.GRAVITY_CENTER_HORIZONTAL:
+          alignH = HorizontalAlignment.Center;
+          break;
+        case ComponentConstants.GRAVITY_RIGHT:
+          alignH = HorizontalAlignment.Right;
+          break;
+        default:
+          // This error should not happen because the higher level
+          // setter for HorizontalAlignment should screen out illegal inputs.
+          ErrorReporter.reportError(MESSAGES.badValueForHorizontalAlignment(alignment));
       }
     } catch (NumberFormatException e) {
       // As above, this error should not happen
@@ -706,19 +712,19 @@ abstract class MockHVLayoutBase extends MockLayout {
   public void setVAlignmentFlags(String alignment) {
     try {
       switch (Integer.parseInt(alignment)) {
-      case ComponentConstants.GRAVITY_TOP:
-        alignV = VerticalAlignment.Top;
-        break;
-      case ComponentConstants.GRAVITY_CENTER_VERTICAL:
-        alignV = VerticalAlignment.Center;
-        break;
-      case ComponentConstants.GRAVITY_BOTTOM:
-        alignV = VerticalAlignment.Bottom;
-        break;
-      default:
-        // This error should not happen because the higher level
-        // setter for VerticalAlignment should screen out illegal inputs.
-        ErrorReporter.reportError(MESSAGES.badValueForVerticalAlignment(alignment));
+        case ComponentConstants.GRAVITY_TOP:
+          alignV = VerticalAlignment.Top;
+          break;
+        case ComponentConstants.GRAVITY_CENTER_VERTICAL:
+          alignV = VerticalAlignment.Center;
+          break;
+        case ComponentConstants.GRAVITY_BOTTOM:
+          alignV = VerticalAlignment.Bottom;
+          break;
+        default:
+          // This error should not happen because the higher level
+          // setter for VerticalAlignment should screen out illegal inputs.
+          ErrorReporter.reportError(MESSAGES.badValueForVerticalAlignment(alignment));
       }
     } catch (NumberFormatException e) {
       // As above, this error should not happen
