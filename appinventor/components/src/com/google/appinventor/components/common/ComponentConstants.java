@@ -25,6 +25,10 @@ public class ComponentConstants {
   public static final int EMPTY_HV_ARRANGEMENT_WIDTH = 100;
   public static final int EMPTY_HV_ARRANGEMENT_HEIGHT = 100;
 
+  public static final int EMPTY_RELATIVE_ARRANGEMENT_WIDTH = 200;
+  public static final int EMPTY_RELATIVE_ARRANGEMENT_HEIGHT = 200;
+
+
   /**
    * Canvas component.
    */
