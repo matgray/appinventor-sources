@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TableRow;
 
 /**
@@ -160,6 +161,48 @@ public final class ViewUtil {
       view.requestLayout();
     } else {
       Log.e("ViewUtil", "The view does not have table layout parameters");
+    }
+  }
+
+  public static void setChildWidthForRelativeLayout(View view, int width) {
+    Object layoutParams = view.getLayoutParams();
+    if (layoutParams instanceof RelativeLayout.LayoutParams) {
+      RelativeLayout.LayoutParams relativeLayoutParams = (RelativeLayout.LayoutParams) layoutParams;
+      switch (width) {
+        case Component.LENGTH_PREFERRED:
+          relativeLayoutParams.width = RelativeLayout.LayoutParams.WRAP_CONTENT;
+          break;
+        case Component.LENGTH_FILL_PARENT:
+          relativeLayoutParams.width = RelativeLayout.LayoutParams.FILL_PARENT;
+          break;
+        default:
+          relativeLayoutParams.width = width;
+          break;
+      }
+      view.requestLayout();
+    } else {
+      Log.e("ViewUtil", "The view does not have relative layout parameters");
+    }
+  }
+
+  public static void setChildHeightForRelativeLayout(View view, int height) {
+    Object layoutParams = view.getLayoutParams();
+    if (layoutParams instanceof RelativeLayout.LayoutParams) {
+      RelativeLayout.LayoutParams relativeLayoutParams = (RelativeLayout.LayoutParams) layoutParams;
+      switch (height) {
+        case Component.LENGTH_PREFERRED:
+          relativeLayoutParams.height = RelativeLayout.LayoutParams.WRAP_CONTENT;
+          break;
+        case Component.LENGTH_FILL_PARENT:
+          relativeLayoutParams.height = RelativeLayout.LayoutParams.FILL_PARENT;
+          break;
+        default:
+          relativeLayoutParams.height = height;
+          break;
+      }
+      view.requestLayout();
+    } else {
+      Log.e("ViewUtil", "The view does not have relative layout parameters");
     }
   }
 
